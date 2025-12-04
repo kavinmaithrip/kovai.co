@@ -74,6 +74,8 @@ Instantly for forecasting
 In contrast, LSTMs or Prophet models require more compute and tuning.
 
 **Forecasting**
+
+
 ![Future Forecast](/future_forecast.jpeg)
 
 # **1. Strong Weekly Seasonality Dominates Ridership Trends**
