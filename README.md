@@ -74,7 +74,7 @@ Instantly for forecasting
 In contrast, LSTMs or Prophet models require more compute and tuning.
 
 **Forecasting**
-![Future Forecast](/future_forecast.png)
+![Future Forecast](/future_forecast.jpeg)
 
 # **1. Strong Weekly Seasonality Dominates Ridership Trends**
 STL decomposition shows that weekly seasonality contributes more variance than long-term trends. This stable, recurring weekly pattern makes the dataset highly suitable for models like Prophet and SARIMA.
