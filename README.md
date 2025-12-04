@@ -1,77 +1,97 @@
 # **Time-Series Forecasting of Urban Mobility Patterns in Public Transport Data**
 
-**Why ARIMA Fits This Dataset**
-**Clear Autocorrelation Patterns Identified During EDA**
+**Why SARIMA Was Chosen**
+**Strong Weekly Seasonality Identified**
 
-From the cross-correlation and autocorrelation plots, it was evident that:
+Exploratory Data Analysis (STL decomposition and rolling mean plots) revealed a clear 7-day repeating pattern:
 
-Yesterday’s ridership strongly influences today’s ridership.
+Higher ridership on weekdays
 
-The dataset exhibits lag-based dependencies typical in commuter data.
+Significant drops on weekends
 
-ARIMA is specifically designed to model autocorrelation using the autoregressive (AR) and moving average (MA) components.
+This pattern repeats consistently across years
 
-**The Dataset Shows Mild Non-Stationarity**
+ARIMA cannot model such repeating cycles, but SARIMA is specifically designed to capture seasonal patterns via the seasonal order terms:​
 
-The rolling mean and rolling variance plots show:
+where m=7
 
-Slight upward or downward drifts over long periods
+This makes SARIMA the most appropriate statistical model for the dataset.
 
-Local fluctuations around a baseline pattern
+**Autocorrelation Exhibits Seasonal Lag Structure**
 
-ARIMA handles this using the Integrated (I) component, which applies differencing to stabilize the mean.
+ACF plots show pronounced spikes at lag = 7, 14, 21…
+This means ridership on a given day is strongly influenced by ridership from one week prior.
 
-This makes ARIMA ideal for your dataset because:
+This kind of periodic autocorrelation is a textbook indicator for using a seasonal ARIMA model.
 
-It stabilizes trends
+**Short-Term Dynamics + Seasonal Patterns**
 
-Removes long-term drifts
+The dataset shows:
 
-Makes the series suitable for forecasting
+Strong short-term autocorrelation (lags 1–3)
 
-**ARIMA Works Extremely Well for Univariate Time-Series**
+Weekly seasonal periodicity (lag 7)
 
-Each service in your dataset (Local Route, Rapid Route, Light Rail, etc.) is a single-column time series.
+Mild long-term trend
 
-ARIMA excels in univariate forecasting scenarios because:
+Occasional anomalies
 
-It doesn't require additional features
+SARIMA is uniquely equipped to combine:
 
-It models temporal patterns directly
+Short-term AR/MA behavior (via p, q)
 
-It performs accurately even with small datasets
+Differencing to remove trend (via d)
 
-Given your data format, ARIMA is the best-fitting classical model.
+Seasonal differencing to remove weekly cycles (via D)
 
-**ARIMA Provides Highly Interpretable Statistical Structure**
+Seasonal AR/MA terms for weekly influence
 
-ARIMA produces interpretable parameters:
+This makes SARIMA superior to ARIMA, ETS, and simple exponential smoothing.
 
-p → autoregressive terms
+**Multivariate Features Are Not Required**
 
-d → differencing
+Each service (Local Route, Rapid Route, Peak Service, etc.) is forecasted individually.
+SARIMA works well for univariate seasonal time series, making it a natural fit.
 
-q → moving average terms
+**SARIMA Model Configuration**​
 
-These help you understand:
+Auto-ARIMA determined the best combination of parameters for each service:
 
-How many past days influence the forecast
+p, d, q capture short-term autoregressive patterns
 
-Whether the series needed differencing
+P, D, Q capture weekly seasonal influence
 
-How noise affects the system
+m = 7 because ridership follows a 7-day cycle
 
-This interpretability is extremely useful in a real-world transportation context.
+This ensures the model accounts for both day-to-day fluctuations and weekly commuting behavior.
 
-**ARIMA Is Efficient and Fast**
+**Model Training & Validation**
+**Train–Test Split**
 
-Your dataset has ~1900 daily observations — small enough that ARIMA trains in:
+The final 30 days of the dataset were used as a validation window.
 
-1–3 seconds for model fitting
+SARIMA forecasted those 30 days.
 
-Instantly for forecasting
+Actual vs forecast values show strong alignment.
 
-In contrast, LSTMs or Prophet models require more compute and tuning.
+**Forecast Confidence Intervals**
+
+The model outputs a 95% confidence interval, showing uncertainty around predictions.
+This is crucial for transport planning, where unexpected events may cause deviations.
+
+**Diagnostic Checks**
+
+SARIMA residual diagnostics indicate:
+
+Residuals resemble white noise (no patterns left)
+
+No strong autocorrelation in residuals
+
+Variance is stable
+
+Forecast errors centered around zero
+
+This confirms the model successfully captured the meaningful structure of the series.
 
 **Forecasting**
 
@@ -79,7 +99,7 @@ In contrast, LSTMs or Prophet models require more compute and tuning.
 ![Future Forecast](/future_forecast.jpeg)
 
 # **1. Strong Weekly Seasonality Dominates Ridership Trends**
-STL decomposition shows that weekly seasonality contributes more variance than long-term trends. This stable, recurring weekly pattern makes the dataset highly suitable for models like Prophet and SARIMA.
+STL decomposition shows that weekly seasonality contributes more variance than long-term trends. This stable, recurring weekly pattern makes the dataset highly suitable for models like Prophet, SARIMA and ARIMA.
 ![STL Decomposition](/STL_decomposition.png)
 
 # **2. Local Route Ridership Predicts Peak Service with a 1-Day Lead**
